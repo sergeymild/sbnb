@@ -17,6 +17,15 @@ class SbnbModule(reactContext: ReactApplicationContext) :
 
   var isFitsSystemWindows = true
 
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  fun statusBarHeight(): Double {
+    return currentActivity!!.statusBarHeight.toDouble()
+  }
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  fun navigationBarHeight(): Double {
+    return currentActivity!!.navigationBarHeight.toDouble()
+  }
+
   @ReactMethod
   fun setSystemUIColor(color: Double) {
     currentActivity?.runOnUiThread {
