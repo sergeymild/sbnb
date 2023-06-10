@@ -1,6 +1,8 @@
-import React from "react";
+import React, {useCallback, useEffect, useRef} from "react";
 import {Platform} from "react-native";
-import {setStatusBarStyle, setSystemUIColor, toggleFitsSystemWindows} from "./index";
+import {setStatusBarStyle, setSystemUIColor, toggleFitsSystemWindows as _toggleFitsSystemWindows} from "./index";
+// @ts-ignore
+import NativeStatusBarManagerIOS from 'react-native/Libraries/Components/StatusBar/NativeStatusBarManagerIOS'
 
 
 function createStackEntry(props: any): any {
@@ -31,116 +33,117 @@ function mergePropsStack(
   );
 }
 
-
-
-export class StatusBar extends React.Component<{
+interface Props {
   backgroundColor?: string;
   translucent?: boolean;
   barStyle?: ('default' | 'light-content' | 'dark-content'),
-}> {
-  static _propsStack: Array<any> = []
+  changeOnFocus?: boolean
+}
 
-  static _defaultProps: any = createStackEntry({
-    backgroundColor: 'black',
-    barStyle: 'default',
-    translucent: false,
-    hidden: false,
-    networkActivityIndicatorVisible: false,
-  })
-  static _updateImmediate?: any;
-  static _currentValues: {
-    hidden: boolean;
-    translucent: boolean;
-    barStyle:('default' | 'light-content' | 'dark-content')
-  } | null = null;
+const _propsStack: Array<any> = []
 
-  static setBackgroundColor(color: string): void {
-    setSystemUIColor(color)
-  }
+let _updateImmediate: any | undefined
+let _currentValues: {
+  hidden: boolean;
+  translucent: boolean;
+  barStyle:('default' | 'light-content' | 'dark-content')
+} | null = null
 
-  static toggleFitsSystemWindows(isEnabled: boolean) {
-    if (Platform.OS !== 'android') return
-    StatusBar._defaultProps.translucent = isEnabled
-    toggleFitsSystemWindows(isEnabled)
-  }
+let _defaultProps: any = {
+  backgroundColor: 'black',
+  barStyle: 'default',
+  translucent: false,
+  hidden: false,
+}
 
-  static pushStackEntry(props: any): any {
-    const entry = createStackEntry(props)
-    StatusBar._propsStack.push(entry)
-    StatusBar._updatePropsStack()
-    return entry
-  }
+function toggleFitsSystemWindows(isEnabled: boolean) {
+  if (Platform.OS !== 'android') return
+  _defaultProps.translucent = isEnabled
+  _toggleFitsSystemWindows(isEnabled)
+}
 
-  static popStackEntry(entry: any) {
-    const index = StatusBar._propsStack.indexOf(entry)
-    if (index !== -1) StatusBar._propsStack.splice(index, 1)
+function pushStackEntry(props: any): any {
+  const entry = createStackEntry(props)
+  _propsStack.push(entry)
+  _updatePropsStack()
+  return entry
+}
 
-    StatusBar._updatePropsStack()
-  }
+function popStackEntry(entry: any) {
+  const index = _propsStack.indexOf(entry)
+  if (index !== -1) _propsStack.splice(index, 1)
+  _updatePropsStack()
+}
 
-  static replaceStackEntry(entry: any, props: any): any {
-    const newEntry = createStackEntry(props)
-    const index = StatusBar._propsStack.indexOf(entry)
-    if (index !== -1) StatusBar._propsStack[index] = newEntry
+function replaceStackEntry(entry: any, props: any): any {
+  const newEntry = createStackEntry(props)
+  const index = _propsStack.indexOf(entry)
+  if (index !== -1) _propsStack[index] = newEntry
 
-    StatusBar._updatePropsStack()
-    return newEntry
-  }
+  _updatePropsStack()
+  return newEntry
+}
 
-  _stackEntry = null
+function _updatePropsStack() {
+  // Send the update to the native module only once at the end of the frame.
+  clearImmediate(_updateImmediate)
+  _updateImmediate = setImmediate(() => {
+    const oldProps = _currentValues
+    const mergedProps = mergePropsStack(_propsStack, _defaultProps)
 
-  componentDidMount() {
-    this._stackEntry = StatusBar.pushStackEntry(this.props)
-  }
 
-  componentWillUnmount() {
-    StatusBar.popStackEntry(this._stackEntry)
-  }
 
-  componentDidUpdate() {
-    this._stackEntry = StatusBar.replaceStackEntry(this._stackEntry, this.props)
-  }
-
-  /**
-   * Updates the native status bar with the props from the stack.
-   */
-  static _updatePropsStack = () => {
-    // Send the update to the native module only once at the end of the frame.
-    clearImmediate(StatusBar._updateImmediate)
-    StatusBar._updateImmediate = setImmediate(() => {
-      const oldProps = StatusBar._currentValues
-      const mergedProps = mergePropsStack(
-        StatusBar._propsStack,
-        StatusBar._defaultProps,
-      )
-      console.log('[StatusBar.]', mergedProps)
-
-      // Update the props that have changed using the merged values from the props stack.
-      if (Platform.OS === 'ios') {
-        if (!oldProps || oldProps.hidden !== mergedProps.hidden) {
-
-        }
-      } else if (Platform.OS === 'android') {
-        if (mergedProps.backgroundColor == null) {
-        } else {
-          setSystemUIColor(mergedProps.backgroundColor)
-        }
-        setStatusBarStyle(mergedProps.barStyle === 'dark-content')
-
-        if (
-          !oldProps ||
-          oldProps.translucent !== mergedProps.translucent ||
-          mergedProps.translucent
-        ) {
-          toggleFitsSystemWindows(mergedProps.translucent)
-        }
+    // Update the props that have changed using the merged values from the props stack.
+    if (Platform.OS === 'ios') {
+      if (!oldProps || oldProps.barStyle !== mergedProps.barStyle) {
+        NativeStatusBarManagerIOS.setStyle(mergedProps.barStyle, false,);
       }
-      // Update the current prop values.
-      StatusBar._currentValues = mergedProps
-    })
+    } else if (Platform.OS === 'android') {
+      if (mergedProps.backgroundColor == null) {
+      } else {
+        setSystemUIColor(mergedProps.backgroundColor)
+      }
+      setStatusBarStyle(mergedProps.barStyle === 'dark-content')
+
+      if (
+        !oldProps ||
+        oldProps.translucent !== mergedProps.translucent ||
+        mergedProps.translucent
+      ) {
+        toggleFitsSystemWindows(mergedProps.translucent)
+      }
+    }
+    // Update the current prop values.
+    _currentValues = mergedProps
+  })
+}
+
+
+export function StatusBar(props: Props) {
+  const _stackEntry = useRef<any>()
+
+  try {
+    if (props.changeOnFocus) {
+      require('@react-navigation/native').useFocusEffect(useCallback(() => {
+        _stackEntry.current = pushStackEntry(props)
+        return () => {
+          popStackEntry(_stackEntry.current)
+        }
+      }, []))
+    }
+  } catch (e) {
   }
 
-  render() {
-    return null
-  }
+  useEffect(() => {
+    if (props.changeOnFocus) return
+    _stackEntry.current = pushStackEntry(props)
+    return () => popStackEntry(_stackEntry.current)
+  }, [])
+
+  useEffect(() => {
+    if (!_stackEntry.current) return
+    _stackEntry.current = replaceStackEntry(_stackEntry.current, props)
+  }, [props])
+
+  return null
 }

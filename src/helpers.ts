@@ -18,21 +18,26 @@ const Sbnb = NativeModules.Sbnb
   );
 
 export function setSystemUIColor(color: ColorValue) {
+  if (Platform.OS === 'ios') return
   return Sbnb.setSystemUIColor(processColor(color))
 }
 
 export function setStatusBarStyle(dark: boolean) {
+  if (Platform.OS === 'ios') return
   return Sbnb.setStatusBarStyle(dark)
 }
 
 export function toggleFitsSystemWindows(isEnabled: boolean) {
+  if (Platform.OS === 'ios') return
   return Sbnb.toggleFitsSystemWindows(!isEnabled)
 }
 
 export function statusBarHeight(): number {
+  if (Platform.OS === 'ios') return 0
   return Sbnb.statusBarHeight()
 }
 
 export function navigationBarHeight(): number {
+  if (Platform.OS === 'ios') return 0
   return Sbnb.navigationBarHeight()
 }
