@@ -2,6 +2,8 @@ package com.sbnb
 
 import android.graphics.Color
 import android.os.Build
+import android.view.View
+import android.view.WindowInsetsController
 import androidx.core.view.WindowCompat
 import com.facebook.react.bridge.ColorPropConverter
 import com.facebook.react.bridge.ReactApplicationContext
@@ -24,6 +26,30 @@ class SbnbModule(reactContext: ReactApplicationContext) :
   @ReactMethod(isBlockingSynchronousMethod = true)
   fun navigationBarHeight(): Double {
     return currentActivity!!.navigationBarHeight.toDouble()
+  }
+
+  @ReactMethod
+  fun setStatusBarStyle(dark: Boolean) {
+    currentActivity?.runOnUiThread {
+      val activity = currentActivity ?: return@runOnUiThread
+      if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return@runOnUiThread
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        activity.window.decorView.windowInsetsController?.setSystemBarsAppearance(
+          if (dark) WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS else 0,
+          WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+        );
+      } else {
+        if (!dark) {
+          // Draw light icons on a dark background color
+          activity.window.decorView.systemUiVisibility =
+            activity.window.decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
+        } else {
+          // Draw dark icons on a light background color
+          activity.window.decorView.systemUiVisibility =
+            activity.window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        }
+      }
+    }
   }
 
   @ReactMethod
