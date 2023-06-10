@@ -1,4 +1,4 @@
-import { NativeModules, Platform } from 'react-native';
+import {ColorValue, NativeModules, Platform, processColor} from 'react-native';
 
 const LINKING_ERROR =
   `The package 'react-native-sbnb' doesn't seem to be linked. Make sure: \n\n` +
@@ -17,6 +17,10 @@ const Sbnb = NativeModules.Sbnb
       }
     );
 
-export function multiply(a: number, b: number): Promise<number> {
-  return Sbnb.multiply(a, b);
+export function setSystemUIColor(color: ColorValue, opacity: number = 0) {
+  return Sbnb.setSystemUIColor(processColor(color), opacity)
+}
+
+export function toggleFitsSystemWindows(isEnabled: boolean) {
+  return Sbnb.toggleFitsSystemWindows(isEnabled)
 }

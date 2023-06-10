@@ -1,9 +1,12 @@
 package com.sbnb
 
+import android.graphics.Color
+import android.os.Build
+import androidx.core.view.WindowCompat
+import com.facebook.react.bridge.ColorPropConverter
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
-import com.facebook.react.bridge.Promise
 
 class SbnbModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
@@ -12,11 +15,41 @@ class SbnbModule(reactContext: ReactApplicationContext) :
     return NAME
   }
 
-  // Example method
-  // See https://reactnative.dev/docs/native-modules-android
+  var isFitsSystemWindows = true
+
   @ReactMethod
-  fun multiply(a: Double, b: Double, promise: Promise) {
-    promise.resolve(a * b)
+  fun setSystemUIColor(color: Double) {
+    currentActivity?.runOnUiThread {
+      currentActivity?.let {
+        val newColor = ColorPropConverter.getColor(color, it)
+        it.window.statusBarColor = newColor
+        if (isFitsSystemWindows || it.systemNavigationMode != SystemNavigationMode.GESTURE) {
+          it.window.navigationBarColor = newColor
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+          it.window?.isNavigationBarContrastEnforced = false
+        }
+      }
+    }
+  }
+
+  @ReactMethod
+  fun toggleFitsSystemWindows(isEnabled: Boolean) {
+    currentActivity?.runOnUiThread {
+      currentActivity?.let {
+        isFitsSystemWindows = isEnabled
+        WindowCompat.setDecorFitsSystemWindows(it.window, isFitsSystemWindows)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+          it.window?.isNavigationBarContrastEnforced = false
+        }
+        if (it.systemNavigationMode == SystemNavigationMode.GESTURE) {
+          it.window.navigationBarColor = Color.TRANSPARENT
+        }
+        if (isFitsSystemWindows) {
+          it.window.navigationBarColor = it.window.statusBarColor
+        }
+      }
+    }
   }
 
   companion object {

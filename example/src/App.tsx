@@ -1,18 +1,27 @@
 import * as React from 'react';
 
-import { StyleSheet, View, Text } from 'react-native';
-import { multiply } from 'react-native-sbnb';
+import {ImageBackground, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {setSystemUIColor, toggleFitsSystemWindows} from 'react-native-sbnb';
 
 export default function App() {
-  const [result, setResult] = React.useState<number | undefined>();
 
-  React.useEffect(() => {
-    multiply(3, 7).then(setResult);
-  }, []);
 
   return (
     <View style={styles.container}>
-      <Text>Result: {result}</Text>
+      <ImageBackground source={{uri: 'https://i.stack.imgur.com/0iSwH.png'}} style={StyleSheet.absoluteFill} />
+      <TouchableOpacity style={{alignSelf: 'center', marginTop: 300, backgroundColor: 'black'}} onPress={() => {
+        const randomColor = Math.floor(Math.random()*16777215).toString(16);
+        setSystemUIColor(`#${randomColor}80`)
+        // setSystemUIColor(`#${randomColor}`)
+      }}>
+        <Text children={'Change color'}/>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={{alignSelf: 'center', marginTop: 50, backgroundColor: 'black'}} onPress={() => {
+        toggleFitsSystemWindows(true)
+      }}>
+        <Text children={'immersiveStatusBar'}/>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -20,12 +29,5 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  box: {
-    width: 60,
-    height: 60,
-    marginVertical: 20,
   },
 });
