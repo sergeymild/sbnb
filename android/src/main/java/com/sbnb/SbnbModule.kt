@@ -9,6 +9,7 @@ import com.facebook.react.bridge.ColorPropConverter
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
+import com.facebook.react.uimanager.PixelUtil
 
 class SbnbModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
@@ -21,11 +22,12 @@ class SbnbModule(reactContext: ReactApplicationContext) :
 
   @ReactMethod(isBlockingSynchronousMethod = true)
   fun statusBarHeight(): Double {
-    return currentActivity!!.statusBarHeight.toDouble()
+    return PixelUtil.toDIPFromPixel(currentActivity!!.statusBarHeight.toFloat()).toDouble()
   }
   @ReactMethod(isBlockingSynchronousMethod = true)
   fun navigationBarHeight(): Double {
-    return currentActivity!!.navigationBarHeight.toDouble()
+    if (isFitsSystemWindows) return 0.0
+    return PixelUtil.toDIPFromPixel(currentActivity!!.navigationBarHeight.toFloat()).toDouble()
   }
 
   @ReactMethod
