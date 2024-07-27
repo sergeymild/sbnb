@@ -72,21 +72,21 @@ class SbnbModule(reactContext: ReactApplicationContext) :
 
   @ReactMethod
   fun toggleFitsSystemWindows(isEnabled: Boolean) {
-    currentActivity?.runOnUiThread {
-      currentActivity?.let {
-        isFitsSystemWindows = isEnabled
-        WindowCompat.setDecorFitsSystemWindows(it.window, isFitsSystemWindows)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-          it.window?.isNavigationBarContrastEnforced = false
-        }
-        if (it.systemNavigationMode == SystemNavigationMode.GESTURE) {
-          it.window.navigationBarColor = Color.TRANSPARENT
-        }
-        if (isFitsSystemWindows) {
-          it.window.navigationBarColor = it.window.statusBarColor
-        }
-      }
-    }
+    //currentActivity?.runOnUiThread {
+    //  currentActivity?.let {
+    //    isFitsSystemWindows = isEnabled
+    //    WindowCompat.setDecorFitsSystemWindows(it.window, isFitsSystemWindows)
+    //    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+    //      it.window?.isNavigationBarContrastEnforced = false
+    //    }
+    //    if (it.systemNavigationMode == SystemNavigationMode.GESTURE) {
+    //      it.window.navigationBarColor = Color.TRANSPARENT
+    //    }
+    //    if (isFitsSystemWindows) {
+    //      it.window.navigationBarColor = it.window.statusBarColor
+    //    }
+    //  }
+    //}
   }
 
   companion object {
