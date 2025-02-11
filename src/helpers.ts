@@ -1,4 +1,9 @@
-import {ColorValue, NativeModules, Platform, processColor} from "react-native";
+import {
+  ColorValue,
+  NativeModules,
+  Platform,
+  processColor,
+} from 'react-native';
 
 const LINKING_ERROR =
   `The package 'react-native-sbnb' doesn't seem to be linked. Make sure: \n\n` +
@@ -9,35 +14,35 @@ const LINKING_ERROR =
 const Sbnb = NativeModules.Sbnb
   ? NativeModules.Sbnb
   : new Proxy(
-    {},
-    {
-      get() {
-        throw new Error(LINKING_ERROR);
-      },
-    }
-  );
+      {},
+      {
+        get() {
+          throw new Error(LINKING_ERROR);
+        },
+      }
+    );
 
-export function setSystemUIColor(color: ColorValue) {
-  if (Platform.OS === 'ios') return
-  return Sbnb.setSystemUIColor(processColor(color))
+export function setSystemUIColor(color: ColorValue, navColor: ColorValue) {
+  if (Platform.OS === 'ios') return;
+  return Sbnb.setSystemUIColor(processColor(color), processColor(navColor));
 }
 
 export function setStatusBarStyle(dark: boolean) {
-  if (Platform.OS === 'ios') return
-  return Sbnb.setStatusBarStyle(dark)
+  if (Platform.OS === 'ios') return;
+  return Sbnb.setStatusBarStyle(dark);
 }
 
 export function toggleFitsSystemWindows(isEnabled: boolean) {
-  if (Platform.OS === 'ios') return
-  return Sbnb.toggleFitsSystemWindows(!isEnabled)
+  if (Platform.OS === 'ios') return;
+  return Sbnb.toggleFitsSystemWindows(!isEnabled);
 }
 
 export function statusBarHeight(): number {
-  if (Platform.OS === 'ios') return 0
-  return Sbnb.statusBarHeight()
+  if (Platform.OS === 'ios') return 0;
+  return Sbnb.statusBarHeight();
 }
 
 export function navigationBarHeight(): number {
-  if (Platform.OS === 'ios') return 0
-  return Sbnb.navigationBarHeight()
+  if (Platform.OS === 'ios') return 0;
+  return Sbnb.navigationBarHeight();
 }

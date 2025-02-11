@@ -55,13 +55,15 @@ class SbnbModule(reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod
-  fun setSystemUIColor(color: Double) {
+  fun setSystemUIColor(color: Double, navBarColor: Double) {
     currentActivity?.runOnUiThread {
       currentActivity?.let {
         val newColor = ColorPropConverter.getColor(color, it)
+        val newNavBarColor = ColorPropConverter.getColor(navBarColor, it)
         it.window.statusBarColor = newColor
         if (isFitsSystemWindows || it.systemNavigationMode != SystemNavigationMode.GESTURE) {
           it.window.navigationBarColor = newColor
+          it.window.navigationBarColor = newNavBarColor
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
           it.window?.isNavigationBarContrastEnforced = false
