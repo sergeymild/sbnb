@@ -53,7 +53,7 @@ let _currentValues: {
 
 let _defaultProps: any = {
   backgroundColor: 'black',
-  navBarColor: 'black',
+  navBarColor: undefined,
   barStyle: 'default',
   translucent: false,
   hidden: false,
@@ -100,7 +100,7 @@ function _updatePropsStack() {
         NativeStatusBarManagerIOS.setStyle(mergedProps.barStyle, false);
       }
     } else if (Platform.OS === 'android') {
-      if (mergedProps.backgroundColor == null) {
+      if (!mergedProps.backgroundColor && !mergedProps.navBarColor) {
       } else {
         setSystemUIColor(
           mergedProps.backgroundColor,
