@@ -1,10 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { Platform } from 'react-native';
-import {
-  setStatusBarStyle,
-  setSystemUIColor,
-  toggleFitsSystemWindows as _toggleFitsSystemWindows,
-} from './index';
+import { setStatusBarStyle, setSystemUIColor } from './index';
 // @ts-ignore
 import NativeStatusBarManagerIOS from 'react-native/Libraries/Components/StatusBar/NativeStatusBarManagerIOS';
 
@@ -62,7 +58,6 @@ let _defaultProps: any = {
 function toggleFitsSystemWindows(isEnabled: boolean) {
   if (Platform.OS !== 'android') return;
   _defaultProps.translucent = isEnabled;
-  _toggleFitsSystemWindows(isEnabled);
 }
 
 function pushStackEntry(props: any): any {

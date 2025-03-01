@@ -8,7 +8,7 @@ export const MainScreen: React.FC = () => {
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
       <StatusBar
-        navBarColor={'red'}
+        navBarColor={'yellow'}
         barStyle={'light-content'}
         backgroundColor={'#42f55a'}
       />
